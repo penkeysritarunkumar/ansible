@@ -1,28 +1,21 @@
-- name: Create Users with SSH access and sudo without password
-  hosts: my-hosts 
-  become: true
-
+---
+- hosts: "my-hosts"
   vars:
     users:
-      - satish
-      - kiran
-
+    -  "satish"
+    -  "kiran"
   tasks:
-    - name: Create users
-      user:
-        name: "{{ item }}"
-        groups: admin
-        state: present 
-      loop: "{{ users }}"
-
-    - name: Add SSH key to authorized_keys
-      authorized_key:
-        user: "{{ item }}"
-        key: "{{ lookup('file', './' + item + '_public_key.pub') }}"
-        state: present
-      loop: "{{ users }}"
-
-    - name: Allow admin users to sudo without a password
+  - name: "Create user accounts"
+    user:
+      name: "{{ item }}"
+      groups: "admin"
+    with_items: "{{ users }}"
+  - name: "Add authorized keys"
+    authorized_key:
+      user: "{{ item }}"
+      key: "{{ lookup('file', './'+ item + '_public_key.pub') }}"
+    with_items: "{{ users }}"
+  - name: "Allow admin users to sudo without a password"
     lineinfile:
       dest: "/etc/sudoers" # path: in version 2.3
       state: "present"
