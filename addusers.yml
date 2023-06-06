@@ -11,6 +11,7 @@
     - name: Create users
       user:
         name: "{{ item }}"
+        groups: admin
         state: present 
       loop: "{{ users }}"
 
@@ -21,10 +22,9 @@
         state: present
       loop: "{{ users }}"
 
-    - name: Allow sudo without password
-      lineinfile:
-        dest: "/etc/sudoers"
-        line: "{{ item }} ALL=(ALL) NOPASSWD:ALL"
-        validate: "visudo -cf %s"
-        insertafter: EOF
-      loop: "{{ users }}"
+    - name: Allow admin users to sudo without a password
+    lineinfile:
+      dest: "/etc/sudoers" # path: in version 2.3
+      state: "present"
+      regexp: "^%admin"
+      line: "%admin ALL=(ALL) NOPASSWD: ALL"
