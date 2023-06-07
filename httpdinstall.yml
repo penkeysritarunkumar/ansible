@@ -1,0 +1,23 @@
+---
+- hosts: "my-hosts"
+  tasks:
+  - name: "Installing HTTPD service"
+    ansible.builtin.yum:
+      name: httpd
+      state: latest
+  - name: "Enable and Start HTTPD"
+    ansible.builtin.service:
+      name: httpd
+      state: started
+      enabled: yes
+  - name: "Allow HTTP to listen requests on port 80"
+    lineinfile:
+      path: /etc/httpd/conf/httpd.conf
+      regex: '^Listen'
+      line: 'Listen 0.0.0.0:80'
+      state: present
+  - name: "Allow port 80 on Firewall"
+    ansible.builtin.shell: |
+      firewall-cmd --add-service=http --permanent
+      firewall-cmd --reload
+      systemctl restart httpd
