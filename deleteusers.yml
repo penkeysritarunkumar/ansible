@@ -4,13 +4,13 @@
 
   vars:
     users:
-      - username: satish
-      - username: kiran
+      - satish
+      - kiran
 
   tasks:
     - name: Delete users
       user:
-        name: "{{ item.username }}"
+        name: "{{ item }}"
         state: absent
         remove: true 
       loop: "{{ users }}"
