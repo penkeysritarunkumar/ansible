@@ -6,7 +6,7 @@
     -  "kiran"
   tasks:
   - name: "Ensure group admin exists"
-    group:
+    ansible.builtin.group:
       name: admin
       state: present
   - name: "Create user accounts"
