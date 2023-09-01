@@ -1,0 +1,28 @@
+---
+- name: Save Normal Users to CSV
+  hosts: all
+  gather_facts: true
+  tasks:
+    - name: Create CSV header
+      lineinfile:
+        path: users.csv
+        line: "vm_name,username"
+        state: present
+      delegate_to: localhost
+
+    - name: Get list of normal users
+      shell: grep -E '1[0-9]{3}' /etc/passwd | sed 's/:/ /' | awk '{print $1}'
+      register: normal_users_result
+
+    - name: Extract normal users
+      set_fact:
+        normal_users: "{{ normal_users_result.stdout_lines }}"
+
+    - name: Add users to CSV file
+      lineinfile:
+        path: users.csv
+        line: "{{ inventory_hostname }},{{ item }}"
+        state: present
+      delegate_to: localhost
+      loop: "{{ normal_users }}"
+
